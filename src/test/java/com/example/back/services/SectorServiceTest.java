@@ -1,6 +1,7 @@
 package com.example.back.services;
 
 import com.example.back.dto.SectorRequestDTO;
+import com.example.back.exceptions.ResourceNotFoundException;
 import com.example.back.model.Event;
 import com.example.back.model.Sector;
 import com.example.back.repository.EventRepository;
@@ -68,11 +69,11 @@ class SectorServiceTest {
         when(eventRepository.findById(eventId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             sectorService.createSector(requestDTO);
         });
 
-        assertEquals("Evento não encontrado.", exception.getMessage());
+        assertEquals("Evento não encontrado com o ID: 999", exception.getMessage());
         verify(sectorRepository, never()).save(any());
     }
 

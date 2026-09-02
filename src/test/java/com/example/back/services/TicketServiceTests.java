@@ -1,6 +1,8 @@
 package com.example.back.services;
 
 import com.example.back.dto.TicketRequestDTO;
+import com.example.back.exceptions.BusinessRuleException;
+import com.example.back.exceptions.ResourceNotFoundException;
 import com.example.back.model.Sector;
 import com.example.back.model.Ticket;
 import com.example.back.model.TicketStatus;
@@ -21,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
- public class TicketServiceTests {
+public class TicketServiceTests {
 
     @Mock
     private SectorRepository sectorRepository;
@@ -37,7 +39,7 @@ import static org.mockito.Mockito.*;
 
     @Test
     @DisplayName("Deve comprar ingresso com sucesso e decrementar a capacidade do setor")
-    public void buyTicket_Success(){
+    public void buyTicket_Success() {
         Long sectorId = 1L;
         TicketRequestDTO ticketRequestDTO = new TicketRequestDTO(sectorId);
         User user = new User();
@@ -78,13 +80,12 @@ import static org.mockito.Mockito.*;
 
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
             ticketService.buyTicket(requestDTO, user);
         });
 
         assertEquals("Setor esgotado! Não há mais ingressos disponiveis", exception.getMessage());
         verify(ticketRepository, never()).save(any());
-
     }
 
     @Test
@@ -97,12 +98,11 @@ import static org.mockito.Mockito.*;
         when(sectorRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
             ticketService.buyTicket(requestDTO, user);
         });
 
-        assertEquals("Setor nao encontrado", exception.getMessage());
+        assertEquals("Setor não encontrado", exception.getMessage());
         verify(ticketRepository, never()).save(any());
     }
-
 }

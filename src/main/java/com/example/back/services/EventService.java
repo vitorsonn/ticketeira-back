@@ -2,17 +2,18 @@ package com.example.back.services;
 
 import com.example.back.dto.EventRequestDTO;
 import com.example.back.dto.EventResponseDTO;
+import com.example.back.exceptions.BusinessRuleException;
+import com.example.back.exceptions.ResourceNotFoundException;
 import com.example.back.model.Event;
 import com.example.back.model.Sector;
 import com.example.back.repository.EventRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-
-import static java.util.spi.ToolProvider.findFirst;
 
 @Service
 public class EventService {
@@ -23,7 +24,7 @@ public class EventService {
     @Transactional
     public Event createEvent(EventRequestDTO data) {
         if (data.dateTime().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Não é possível criar eventos em datas passadas.");
+            throw new BusinessRuleException("Não é possível criar eventos em datas passadas.");
         }
 
         Event newEvent = new Event();
@@ -46,23 +47,22 @@ public class EventService {
         }
 
         return repository.save(newEvent);
-
     }
 
-    public List<Event> listAll(){
+    public List<Event> listAll() {
         return repository.findAll();
     }
 
     public EventResponseDTO getById(Long id) {
         Event event = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado com o ID: " + id));
 
         return new EventResponseDTO(event);
     }
 
     public void deleteEvent(Long id) {
         if (!repository.existsById(id)) {
-            throw new RuntimeException("Evento não encontrado com o ID: " + id);
+            throw new ResourceNotFoundException("Evento não encontrado com o ID: " + id);
         }
         repository.deleteById(id);
     }
@@ -70,7 +70,7 @@ public class EventService {
     @Transactional
     public EventResponseDTO updateEvent(Long id, EventRequestDTO dto) {
         Event event = repository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Evento não encontrado com o ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Evento não encontrado com o ID: " + id));
 
         event.setName(dto.name());
         event.setDescription(dto.description());
@@ -86,7 +86,6 @@ public class EventService {
                         .findFirst();
 
                 if (existingSector.isPresent()) {
-
                     Sector sector = existingSector.get();
                     sector.setCapacity(sectorDto.capacity());
                     sector.setPreco(sectorDto.preco());
@@ -104,7 +103,4 @@ public class EventService {
         Event updatedEvent = repository.save(event);
         return new EventResponseDTO(updatedEvent);
     }
-
-
-
 }

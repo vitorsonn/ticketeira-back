@@ -23,32 +23,35 @@ public class TicketController {
     private TicketService ticketService;
 
     @PostMapping
-    public ResponseEntity buy(@RequestBody @Valid TicketRequestDTO data){
+    public ResponseEntity<?> buy(@RequestBody @Valid TicketRequestDTO data) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(!(authentication.getPrincipal() instanceof User)){
+        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario nao autenticado");
         }
+
         User user = (User) authentication.getPrincipal();
         Ticket newTicket = ticketService.buyTicket(data, user);
-
         TicketResponseDTO response = ticketService.toDTO(newTicket);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/my-tickets")
-    public ResponseEntity<List<TicketResponseDTO>> getMyTickets(){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public ResponseEntity<?> getMyTickets() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario nao autenticado");
+        }
+
+        User user = (User) authentication.getPrincipal();
         List<Ticket> tickets = ticketService.listByUser(user);
 
         List<TicketResponseDTO> response = tickets.stream()
-                .map(ticketService:: toDTO)
+                .map(ticketService::toDTO)
                 .toList();
 
         return ResponseEntity.ok(response);
     }
-
-
-
 }

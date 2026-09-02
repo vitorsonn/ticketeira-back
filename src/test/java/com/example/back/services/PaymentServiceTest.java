@@ -1,7 +1,8 @@
 package com.example.back.services;
 
 import com.example.back.dto.TicketResponseDTO;
-import com.example.back.model.Event;
+import com.example.back.exceptions.BusinessRuleException;
+import com.example.back.exceptions.ResourceNotFoundException;
 import com.example.back.model.Sector;
 import com.example.back.model.Ticket;
 import com.example.back.model.TicketStatus;
@@ -46,9 +47,6 @@ class PaymentServiceTest {
 
     @Mock
     private TicketRepository ticketRepository;
-
-    @Mock
-    private QRCodeService qrCodeService;
 
     @Mock
     private TicketService ticketService;
@@ -136,7 +134,7 @@ class PaymentServiceTest {
             mockedStatic.when(() -> PaymentIntent.retrieve(paymentIntentId)).thenReturn(mockIntent);
 
             // Act & Assert
-            RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+            BusinessRuleException ex = assertThrows(BusinessRuleException.class, () -> {
                 paymentService.confirmPayment(paymentIntentId, sectorId);
             });
 
@@ -161,11 +159,11 @@ class PaymentServiceTest {
             mockedStatic.when(() -> PaymentIntent.retrieve(paymentIntentId)).thenReturn(mockIntent);
 
             // Act & Assert
-            RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+            ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
                 paymentService.confirmPayment(paymentIntentId, sectorId);
             });
 
-            assertEquals("nenhum setor encontrado no banco!", ex.getMessage());
+            assertEquals("Setor não encontrado com o ID: 999", ex.getMessage());
         }
     }
 
@@ -193,7 +191,7 @@ class PaymentServiceTest {
             mockedStatic.when(() -> PaymentIntent.retrieve(paymentIntentId)).thenReturn(mockIntent);
 
             // Act & Assert
-            RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+            BusinessRuleException ex = assertThrows(BusinessRuleException.class, () -> {
                 paymentService.confirmPayment(paymentIntentId, sectorId);
             });
 
@@ -232,7 +230,7 @@ class PaymentServiceTest {
             mockedStatic.when(() -> PaymentIntent.retrieve(paymentIntentId)).thenReturn(mockIntent);
 
             // Act & Assert
-            RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+            ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class, () -> {
                 paymentService.confirmPayment(paymentIntentId, sectorId);
             });
 
@@ -270,7 +268,6 @@ class PaymentServiceTest {
         SecurityContextHolder.setContext(securityContext);
 
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
-        when(qrCodeService.generateQRcodeBase64(anyString())).thenReturn("mockBase64QRCodeImage");
         when(ticketRepository.save(any(Ticket.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         TicketResponseDTO expectedDTO = new TicketResponseDTO(
@@ -289,7 +286,6 @@ class PaymentServiceTest {
             assertEquals(expectedDTO, result);
             verify(ticketRepository, times(1)).save(any(Ticket.class));
             verify(ticketService, times(1)).toDTO(any(Ticket.class));
-            verify(qrCodeService, times(1)).generateQRcodeBase64(anyString());
         }
     }
 }
