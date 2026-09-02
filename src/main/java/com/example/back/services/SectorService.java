@@ -16,6 +16,7 @@ public class SectorService {
     @Autowired
     private SectorRepository sectorRepository;
 
+    @Autowired
     private EventRepository eventRepository;
 
     public Sector createSector(SectorRequestDTO data){
