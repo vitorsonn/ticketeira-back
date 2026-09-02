@@ -14,11 +14,16 @@ import java.util.List;
 @Service
 public class SectorService {
 
-    @Autowired
-    private SectorRepository sectorRepository;
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final SectorRepository sectorRepository;
+
+
+    private final EventRepository eventRepository;
+
+    public SectorService(SectorRepository sectorRepository, EventRepository eventRepository) {
+        this.sectorRepository = sectorRepository;
+        this.eventRepository = eventRepository;
+    }
 
     public Sector createSector(SectorRequestDTO data) {
         Event event = eventRepository.findById(data.eventId())

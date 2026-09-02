@@ -20,13 +20,16 @@ public class UserController {
 
 
 
-    @Autowired
-    private UserService userService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final UserService userService;
 
 
+    private final AuthenticationManager authenticationManager;
+
+    public UserController(UserService userService, AuthenticationManager authenticationManager) {
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
+    }
 
 
     @PostMapping("/register")

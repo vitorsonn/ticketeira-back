@@ -25,8 +25,12 @@ public class UserService implements UserDetailsService {
 
     private final long EXPIRATION_TIME = 86400000;
 
-    @Autowired
-    private UserRepository repository;
+
+    private final UserRepository repository;
+
+    public UserService(UserRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

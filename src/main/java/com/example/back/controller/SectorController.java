@@ -15,8 +15,12 @@ import java.util.List;
 @RequestMapping("/sectors")
 public class SectorController {
 
-    @Autowired
-    private SectorService sectorService;
+
+    private final SectorService sectorService;
+
+    public SectorController(SectorService sectorService) {
+        this.sectorService = sectorService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Sector>> getAll(){

@@ -19,8 +19,12 @@ import java.util.List;
 @RequestMapping("/events")
 public class EventController {
 
-    @Autowired
-    private EventService eventService;
+
+    private final EventService eventService;
+
+    public EventController(EventService eventService) {
+        this.eventService = eventService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Event>> getAll(){

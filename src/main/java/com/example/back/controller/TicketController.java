@@ -19,8 +19,12 @@ import java.util.List;
 @RequestMapping("/tickets")
 public class TicketController {
 
-    @Autowired
-    private TicketService ticketService;
+
+    private final TicketService ticketService;
+
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
+    }
 
     @PostMapping
     public ResponseEntity<?> buy(@RequestBody @Valid TicketRequestDTO data) {

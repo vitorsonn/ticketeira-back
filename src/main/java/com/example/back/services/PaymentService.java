@@ -29,23 +29,31 @@ import java.util.UUID;
 @Service
 public class PaymentService {
 
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private SectorRepository sectorRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private TicketRepository ticketRepository;
 
-    @Autowired
-    private QRCodeService qrCodeService;
+    private final SectorRepository sectorRepository;
 
-    @Autowired
-    private TicketService ticketService;
+
+    private final TicketRepository ticketRepository;
+
+
+    private final QRCodeService qrCodeService;
+
+
+    private final TicketService ticketService;
 
     @Value("${stripe.api.key}")
     private String secretKey;
+
+    public PaymentService(UserRepository userRepository, SectorRepository sectorRepository, TicketRepository ticketRepository, QRCodeService qrCodeService, TicketService ticketService) {
+        this.userRepository = userRepository;
+        this.sectorRepository = sectorRepository;
+        this.ticketRepository = ticketRepository;
+        this.qrCodeService = qrCodeService;
+        this.ticketService = ticketService;
+    }
 
     @PostConstruct
     public void init() {

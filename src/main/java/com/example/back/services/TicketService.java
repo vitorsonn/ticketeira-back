@@ -22,17 +22,24 @@ import java.util.UUID;
 @Service
 public class TicketService {
 
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private QRCodeService qrCodeService;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private SectorRepository sectorRepository;
 
-    @Autowired
-    private TicketRepository ticketRepository;
+    private final QRCodeService qrCodeService;
+
+
+    private final SectorRepository sectorRepository;
+
+
+    private final TicketRepository ticketRepository;
+
+    public TicketService(UserRepository userRepository, QRCodeService qrCodeService, SectorRepository sectorRepository, TicketRepository ticketRepository) {
+        this.userRepository = userRepository;
+        this.qrCodeService = qrCodeService;
+        this.sectorRepository = sectorRepository;
+        this.ticketRepository = ticketRepository;
+    }
 
     @Transactional
     public Ticket buyTicket(TicketRequestDTO data, User user) {

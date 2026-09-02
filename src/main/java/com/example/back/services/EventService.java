@@ -18,8 +18,12 @@ import java.util.Optional;
 @Service
 public class EventService {
 
-    @Autowired
-    private EventRepository repository;
+
+    private final EventRepository repository;
+
+    public EventService(EventRepository repository) {
+        this.repository = repository;
+    }
 
     @Transactional
     public Event createEvent(EventRequestDTO data) {
