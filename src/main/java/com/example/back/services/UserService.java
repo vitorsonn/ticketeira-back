@@ -59,35 +59,4 @@ public class UserService implements UserDetailsService {
         return repository.save(newUser);
     }
 
-    @Value("${api.security.token.secret}")
-    private String secret;
-
-    private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    public String gerarToken(User user) {
-        return Jwts.builder()
-                .setSubject(user.getEmail())
-                .claim("role", user.getRole().name())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    public String validateToken(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
-        } catch (Exception e) {
-            System.err.println("Token inválido ou expirado: " + e.getMessage());
-            return null;
-        }
-    }
 }
