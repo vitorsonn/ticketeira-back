@@ -47,6 +47,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users/register").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
                         .requestMatchers("/events/**").permitAll()
+                        .requestMatchers("/tickets/**").authenticated()
+                        .requestMatchers("api/payments/**").authenticated()
 
 
                         .requestMatchers("/tickets/**").authenticated()

@@ -1,5 +1,6 @@
 package com.example.back.config;
 
+import com.example.back.application.port.TokenService;
 import com.example.back.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,9 +19,11 @@ import java.io.IOException;
 public class SecurityFilter extends OncePerRequestFilter {
 
 
+    private final TokenService tokenService;
     private final UserService userService;
 
-    public SecurityFilter(UserService userService) {
+    public SecurityFilter(TokenService tokenService, UserService userService) {
+        this.tokenService = tokenService;
         this.userService = userService;
     }
 
@@ -31,7 +34,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = recoverToken(request);
 
         if (token != null) {
-            String email = userService.validateToken(token);
+            String email = tokenService.validateToken(token);
 
             if (email != null) {
                 UserDetails user = userService.loadUserByUsername(email);
