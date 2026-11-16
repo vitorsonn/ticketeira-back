@@ -29,6 +29,9 @@ class SectorServiceTest {
     @Mock
     private EventRepository eventRepository;
 
+    @org.mockito.Spy
+    private com.example.back.mapper.SectorMapper sectorMapper;
+
     @InjectMocks
     private SectorService sectorService;
 

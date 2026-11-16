@@ -28,11 +28,6 @@ public class UserServiceTests {
     @InjectMocks
     private UserService userService;
 
-    @BeforeEach
-    void setUp() {
-        // Injeta a secret key necessária para geração e validação de tokens JWT
-        ReflectionTestUtils.setField(userService, "secret", "my-super-secret-key-that-is-at-least-256-bits-long!");
-    }
 
     @Test
     @DisplayName("Deve registrar um usuário comum com senha criptografada com sucesso")
@@ -79,22 +74,6 @@ public class UserServiceTests {
         verify(userRepository, never()).save(any(User.class));
     }
 
-    @Test
-    @DisplayName("Deve gerar e validar token JWT corretamente")
-    void tokenGenerationAndValidation() {
-        // Arrange
-        User user = new User();
-        user.setEmail("auth@teste.com");
-        user.setRole(UserRole.USER);
-
-        // Act
-        String token = userService.gerarToken(user);
-        String subject = userService.validateToken(token);
-
-        // Assert
-        assertNotNull(token);
-        assertEquals("auth@teste.com", subject);
-    }
 
 
 

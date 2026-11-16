@@ -32,7 +32,7 @@ public class TicketServiceTests {
     private TicketRepository ticketRepository;
 
     @Mock
-    private QRCodeService qrCodeService;
+    private com.example.back.mapper.TicketMapper ticketMapper;
 
     @InjectMocks
     private TicketService ticketService;
@@ -48,6 +48,7 @@ public class TicketServiceTests {
         Sector sector = new Sector();
         sector.setId(sectorId);
         sector.setCapacity(10);
+        sector.setPreco(100.0);
         sector.setName("Pista");
 
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
@@ -77,13 +78,17 @@ public class TicketServiceTests {
         Sector sector = new Sector();
         sector.setId(sectorId);
         sector.setCapacity(0);
+        sector.setPreco(100.0);
 
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
 
-        BusinessRuleException exception = assertThrows(BusinessRuleException.class, () -> {
+        assertThrows(IllegalStateException.class, () -> {
             ticketService.buyTicket(requestDTO, user);
         });
 
+        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> {
+            ticketService.buyTicket(requestDTO, user);
+        });
         assertEquals("Setor esgotado! Não há mais ingressos disponiveis", exception.getMessage());
         verify(ticketRepository, never()).save(any());
     }

@@ -26,6 +26,9 @@ public class EventServiceTests {
     @Mock
     private EventRepository eventRepository;
 
+    @org.mockito.Spy
+    private com.example.back.mapper.EventMapper eventMapper = new com.example.back.mapper.EventMapper(new com.example.back.mapper.SectorMapper());
+
     @InjectMocks
     private EventService eventService;
 

@@ -1,5 +1,6 @@
 package com.example.back.controller;
 
+import com.example.back.application.port.TokenService;
 import com.example.back.config.ControllerAdvice;
 import com.example.back.dto.AuthenticationDTO;
 import com.example.back.dto.UserRequestDTO;
@@ -45,6 +46,9 @@ class UserControllerTest {
 
     @MockitoBean
     private AuthenticationManager authenticationManager;
+
+    @MockitoBean
+    private TokenService tokenService;
 
     @Nested
     @DisplayName("POST /users/register")
@@ -124,7 +128,7 @@ class UserControllerTest {
             when(mockAuth.getPrincipal()).thenReturn(mockUser);
             when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                     .thenReturn(mockAuth);
-            when(userService.gerarToken(mockUser)).thenReturn("fake-jwt-token-12345");
+            when(tokenService.generateToken(mockUser)).thenReturn("fake-jwt-token-12345");
 
             mockMvc.perform(post("/users/login")
                             .contentType(MediaType.APPLICATION_JSON)
@@ -135,7 +139,7 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.email").value("user@teste.com"));
 
             verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
-            verify(userService, times(1)).gerarToken(mockUser);
+            verify(tokenService, times(1)).generateToken(mockUser);
         }
 
         @Test
@@ -155,7 +159,7 @@ class UserControllerTest {
                     .andExpect(jsonPath("$.message").value("Email ou senha inválidos."))
                     .andExpect(jsonPath("$.path").value("/users/login"));
 
-            verify(userService, never()).gerarToken(any());
+            verify(tokenService, never()).generateToken(any());
         }
     }
 }

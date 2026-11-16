@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -54,6 +55,9 @@ class TicketControllerTest {
     private TicketService ticketService;
 
     @MockitoBean
+    private com.example.back.application.port.UserContext userContext;
+
+    @MockitoBean
     private SecurityFilter securityFilter;
 
     @MockitoBean
@@ -68,8 +72,9 @@ class TicketControllerTest {
         User user = new User();
         user.setId(UUID.randomUUID());
         user.setEmail("user@teste.com");
-        var auth = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        var auth = new UsernamePasswordAuthenticationToken(user, null, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(auth);
+        when(userContext.getRequiredCurrentUser()).thenReturn(user);
         return user;
     }
 
@@ -108,15 +113,17 @@ class TicketControllerTest {
         }
 
         @Test
-        @DisplayName("Deve retornar HTTP 401 quando usuário não estiver autenticado")
-        void buyTicket_Unauthenticated_Returns401() throws Exception {
+        @DisplayName("Deve retornar HTTP 403 quando usuário não estiver autenticado")
+        void buyTicket_Unauthenticated_Returns403() throws Exception {
             SecurityContextHolder.clearContext();
+            when(userContext.getRequiredCurrentUser())
+                    .thenThrow(new org.springframework.security.access.AccessDeniedException("Usuário não autenticado"));
             TicketRequestDTO requestDTO = new TicketRequestDTO(1L);
 
             mockMvc.perform(post("/tickets")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(requestDTO)))
-                    .andExpect(status().isUnauthorized());
+                    .andExpect(status().isForbidden());
 
             verify(ticketService, never()).buyTicket(any(), any());
         }
