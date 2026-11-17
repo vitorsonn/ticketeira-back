@@ -26,11 +26,8 @@ public class EventService {
 
     @Transactional
     public Event createEvent(EventRequestDTO data) {
-        if (data.dateTime().isBefore(LocalDateTime.now())) {
-            throw new BusinessRuleException("Não é possível criar eventos em datas passadas.");
-        }
-
         Event newEvent = eventMapper.toEntity(data);
+        newEvent.validateEventDate();
         return repository.save(newEvent);
     }
 

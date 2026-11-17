@@ -15,6 +15,7 @@ import com.example.back.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -42,23 +43,12 @@ public class TicketService {
         Sector sector = sectorRepository.findById(data.sectorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Setor não encontrado"));
 
-        if (sector.getCapacity() <= 0) {
-            throw new BusinessRuleException("Setor esgotado! Não há mais ingressos disponiveis");
-        }
+        String paymentIdentifier = "DIRECT_" + UUID.randomUUID();
 
-        sector.setCapacity(sector.getCapacity() - 1);
+        Ticket ticket = Ticket.createNew(user, sector, BigDecimal.valueOf(sector.getPreco()), paymentIdentifier);
         sectorRepository.save(sector);
-
-        Ticket ticket = new Ticket();
-        ticket.setUser(user);
-        ticket.setSector(sector);
-        ticket.setPurchaseDate(LocalDateTime.now());
-        ticket.setStatus(TicketStatus.ACTIVE);
-        ticket.setQrCode(UUID.randomUUID().toString());
-
         return ticketRepository.save(ticket);
     }
-
     public List<Ticket> listByUser(User user) {
         return ticketRepository.findByUser(user);
     }

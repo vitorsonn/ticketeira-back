@@ -2,6 +2,7 @@ package com.example.back.services;
 
 import com.example.back.dto.UserRequestDTO;
 import com.example.back.exceptions.BusinessRuleException;
+import com.example.back.infrastructure.UserDetailsImpl;
 import com.example.back.model.User;
 import com.example.back.model.UserRole;
 import com.example.back.repository.UserRepository;
@@ -34,8 +35,10 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return repository.findByEmail(username)
+        User user = repository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario não encontrado com o email: " + username));
+
+        return new UserDetailsImpl(user);
     }
 
     @Transactional

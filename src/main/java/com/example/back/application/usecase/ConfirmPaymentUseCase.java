@@ -59,14 +59,7 @@ public class ConfirmPaymentUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
 
-        Ticket ticket = new Ticket();
-        ticket.setPaymentIntentId(paymentIntentId);
-        ticket.setSector(sector);
-        ticket.setUser(user);
-        ticket.setPurchaseDate(LocalDateTime.now());
-        ticket.setPrice(payment.amount());
-        ticket.setQrCode(UUID.randomUUID().toString());
-        ticket.setStatus(TicketStatus.ACTIVE);
+        Ticket ticket = Ticket.createNew(user, sector, payment.amount(), paymentIntentId);
         return ticketRepository.save(ticket);
     }
 

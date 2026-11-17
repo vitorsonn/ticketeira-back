@@ -1,5 +1,6 @@
 package com.example.back.controller;
 
+import com.example.back.application.port.UserContext;
 import com.example.back.dto.TicketRequestDTO;
 import com.example.back.dto.TicketResponseDTO;
 import com.example.back.model.Ticket;
@@ -22,19 +23,18 @@ public class TicketController {
 
     private final TicketService ticketService;
 
-    public TicketController(TicketService ticketService) {
+    private final UserContext userContext;
+
+    public TicketController(TicketService ticketService, UserContext userContext) {
         this.ticketService = ticketService;
+        this.userContext = userContext;
     }
 
     @PostMapping
     public ResponseEntity<?> buy(@RequestBody @Valid TicketRequestDTO data) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario nao autenticado");
-        }
+        User user = userContext.getRequiredCurrentUser();
 
-        User user = (User) authentication.getPrincipal();
         Ticket newTicket = ticketService.buyTicket(data, user);
         TicketResponseDTO response = ticketService.toDTO(newTicket);
 
@@ -43,18 +43,13 @@ public class TicketController {
 
     @GetMapping("/my-tickets")
     public ResponseEntity<?> getMyTickets() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario nao autenticado");
-        }
-
-        User user = (User) authentication.getPrincipal();
+        User user = userContext.getRequiredCurrentUser();
         List<Ticket> tickets = ticketService.listByUser(user);
 
         List<TicketResponseDTO> response = tickets.stream()
                 .map(ticketService::toDTO)
                 .toList();
+
 
         return ResponseEntity.ok(response);
     }

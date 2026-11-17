@@ -1,4 +1,8 @@
 package com.example.back.dto;
 
-public record PaymentInfo() {
+import java.math.BigDecimal;
+
+public record PaymentInfo(String id,
+                          String status,
+                          BigDecimal amount) {
 }
