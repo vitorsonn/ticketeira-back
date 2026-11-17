@@ -1,6 +1,6 @@
 package com.example.back.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,8 +31,24 @@ public class Sector {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
-    @JsonIgnore
     private Event event;
+
+    public boolean hasAvailableCapacity(){
+        return this.capacity != null && this.capacity > 0;
+    }
+
+    public void reserveCapacity(){
+        if(!hasAvailableCapacity()){
+            throw new IllegalStateException("Não há capacidade disponível para reservar neste setor.");
+        }
+        this.capacity--;
+    }
+
+    public void releaseCapacity(){
+        if(this.capacity != null){
+            this.capacity++;
+        }
+    }
 
 
 }

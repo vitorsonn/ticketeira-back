@@ -37,4 +37,18 @@ public class Event {
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Sector> sectors = new ArrayList<>();
 
+    public void validateEventDate(){
+        if(this.dateTime == null || this.dateTime.isBefore(LocalDateTime.now())){
+            throw new IllegalArgumentException("Não é possível criar eventos em datas passadas.");
+        }
+    }
+
+    public void addSector(Sector sector){
+        if (this.sectors == null){
+            this.sectors = new ArrayList<>();
+        }
+        this.sectors.add(sector);
+        sector.setEvent(this);
+    }
+
 }
